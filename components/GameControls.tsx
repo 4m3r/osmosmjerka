@@ -1,4 +1,5 @@
 import { Difficulty } from "@/lib/wordSearch";
+import { Translations } from "@/data/translations";
 
 interface GameControlsProps {
   difficulty: Difficulty;
@@ -9,6 +10,7 @@ interface GameControlsProps {
   onCategoryChange: (category: string) => void;
   score: number;
   time: number;
+  translations: Translations;
 }
 
 export default function GameControls({
@@ -20,6 +22,7 @@ export default function GameControls({
   onCategoryChange,
   score,
   time,
+  translations: t,
 }: GameControlsProps) {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -31,7 +34,7 @@ export default function GameControls({
     <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 space-y-3 sm:space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Kategorija
+          {t.category}
         </label>
         <select
           value={category}
@@ -63,7 +66,7 @@ export default function GameControls({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Težina
+          {t.difficulty}
         </label>
         <div className="flex gap-2">
           {(["easy", "medium", "hard"] as Difficulty[]).map((level) => (
@@ -81,10 +84,10 @@ export default function GameControls({
               `}
             >
               {level === "easy"
-                ? "Lako"
+                ? t.easy
                 : level === "medium"
-                ? "Srednje"
-                : "Teško"}
+                ? t.medium
+                : t.hard}
             </button>
           ))}
         </div>
