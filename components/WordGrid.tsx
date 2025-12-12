@@ -225,8 +225,8 @@ export default function WordGrid({
               >
                 {letter}
                 {isFound && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-full h-0.5 bg-gray-600 transform rotate-0"></div>
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+                    <div className="absolute w-[141%] h-[2px] bg-red-500 transform rotate-45 opacity-80"></div>
                   </div>
                 )}
               </div>
