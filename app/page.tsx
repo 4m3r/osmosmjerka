@@ -206,6 +206,12 @@ export default function Home() {
             />
           </div>
         </div>
+
+        <footer className="mt-8 text-center text-sm text-gray-600">
+          <p className="flex items-center justify-center gap-1">
+            Developed by Amer following instructions from Lajla & Berina ❤️
+          </p>
+        </footer>
       </div>
     </div>
   );
