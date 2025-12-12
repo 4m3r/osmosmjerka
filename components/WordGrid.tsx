@@ -55,6 +55,61 @@ export default function WordGrid({
     });
   };
 
+  const getFoundWordBorderClass = (row: number, col: number): string => {
+    const foundPos = puzzle.positions.find((pos) => {
+      if (!foundWords.has(pos.word)) return false;
+
+      const { rowDir, colDir } = getDirectionDeltas(pos.direction);
+      for (let i = 0; i < pos.word.length; i++) {
+        const cellRow = pos.start.row + i * rowDir;
+        const cellCol = pos.start.col + i * colDir;
+        if (cellRow === row && cellCol === col) return true;
+      }
+      return false;
+    });
+
+    if (!foundPos) return "";
+
+    const { rowDir, colDir } = getDirectionDeltas(foundPos.direction);
+    const wordLength = foundPos.word.length;
+
+    // Find which position this cell is in the word
+    let position = -1;
+    for (let i = 0; i < wordLength; i++) {
+      const cellRow = foundPos.start.row + i * rowDir;
+      const cellCol = foundPos.start.col + i * colDir;
+      if (cellRow === row && cellCol === col) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position === -1) return "";
+
+    const isFirst = position === 0;
+    const isLast = position === wordLength - 1;
+
+    // Build border classes based on direction and position
+    let borders = "border-2 border-blue-500";
+
+    if (foundPos.direction === "horizontal") {
+      borders += " border-t border-b";
+      if (isFirst) borders += " border-l rounded-l-md";
+      if (isLast) borders += " border-r rounded-r-md";
+    } else if (foundPos.direction === "vertical") {
+      borders += " border-l border-r";
+      if (isFirst) borders += " border-t rounded-t-md";
+      if (isLast) borders += " border-b rounded-b-md";
+    } else {
+      // Diagonal - add border on all sides for simplicity
+      borders += " border";
+      if (isFirst) borders += " rounded-tl-md rounded-bl-md";
+      if (isLast) borders += " rounded-tr-md rounded-br-md";
+    }
+
+    return borders;
+  };
+
   const getDirectionDeltas = (direction: string) => {
     switch (direction) {
       case "horizontal":
@@ -189,6 +244,9 @@ export default function WordGrid({
           row.map((letter, colIndex) => {
             const isSelected = isCellSelected(rowIndex, colIndex);
             const isFound = isCellInFoundWord(rowIndex, colIndex);
+            const borderClass = isFound
+              ? getFoundWordBorderClass(rowIndex, colIndex)
+              : "";
 
             return (
               <div
@@ -198,14 +256,13 @@ export default function WordGrid({
                 className={`
                   ${cellSize}
                   flex items-center justify-center
-                  font-bold rounded cursor-pointer
+                  font-bold cursor-pointer
                   transition-colors duration-100
                   active:scale-95
                   relative
+                  ${borderClass}
                   ${
-                    isFound
-                      ? "bg-gray-50 text-gray-400"
-                      : isSelected
+                    isSelected
                       ? "bg-blue-400 text-white shadow-sm"
                       : "bg-gray-100 active:bg-gray-200 text-gray-800"
                   }
@@ -224,11 +281,6 @@ export default function WordGrid({
                 }}
               >
                 {letter}
-                {isFound && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-                    <div className="absolute w-[141%] h-[2px] bg-red-500 transform rotate-45 opacity-80"></div>
-                  </div>
-                )}
               </div>
             );
           })
