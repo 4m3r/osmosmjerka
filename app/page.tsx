@@ -30,7 +30,10 @@ export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
 
   const t = translations[language];
-  const categories = useMemo(() => getCategoriesWithMixed(language), [language]);
+  const categories = useMemo(
+    () => getCategoriesWithMixed(language),
+    [language]
+  );
 
   // Load saved game on mount
   useEffect(() => {
@@ -42,6 +45,9 @@ export default function Home() {
       setFoundWords(new Set(savedState.foundWords));
       setScore(savedState.score);
       setTime(savedState.time);
+      if (savedState.puzzle) {
+        setPuzzle(savedState.puzzle);
+      }
     } else {
       setCategoryName(getCategoriesWithMixed("bs")[0].name);
     }
@@ -59,6 +65,7 @@ export default function Home() {
       foundWords: Array.from(foundWords),
       score,
       time,
+      puzzle,
     });
   }, [
     language,
@@ -77,13 +84,14 @@ export default function Home() {
   };
 
   const createNewPuzzle = useCallback(() => {
-    const isMixedCategory = categoryName === (language === 'bs' ? 'Miješano' : 'Mixed');
-    
+    const isMixedCategory =
+      categoryName === (language === "bs" ? "Miješano" : "Mixed");
+
     // Regenerate mixed category for new game
     if (isMixedCategory) {
       regenerateMixedCategory(language);
     }
-    
+
     const updatedCategories = getCategoriesWithMixed(language);
     const category = updatedCategories.find((cat) => cat.name === categoryName);
     if (!category) return;

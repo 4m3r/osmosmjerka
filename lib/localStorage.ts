@@ -1,5 +1,5 @@
 import { Language } from "@/data/translations";
-import { Difficulty } from "@/lib/wordSearch";
+import { Difficulty, WordSearchPuzzle } from "@/lib/wordSearch";
 
 interface GameState {
   language: Language;
@@ -8,6 +8,7 @@ interface GameState {
   foundWords: string[];
   score: number;
   time: number;
+  puzzle: WordSearchPuzzle | null;
   savedAt: number;
 }
 
