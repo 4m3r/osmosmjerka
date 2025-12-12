@@ -1,4 +1,15 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Osmosmjerka - Bosnian Word Search Game
+
+A fun and interactive word search puzzle game in Bosnian language, perfect for children and language learners!
+
+## Features
+
+- 🎮 **Interactive Gameplay** - Click and drag to select words
+- 🌈 **Multiple Categories** - Animals, fruits, colors, family, school, nature, and food
+- 📊 **Three Difficulty Levels** - Easy (10x10), Medium (15x15), Hard (20x20)
+- ⏱️ **Timer & Scoring** - Track your progress and challenge yourself
+- 🎨 **Kid-Friendly Design** - Colorful and engaging interface
+- 🇧🇦 **Bosnian Language** - Full Bosnian vocabulary and interface
 
 ## Getting Started
 
@@ -16,9 +27,37 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy to Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The easiest way to deploy this app is with Vercel:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+Or manually:
+
+1. Push your code to a Git repository (GitHub, GitLab, Bitbucket)
+2. Go to [Vercel](https://vercel.com)
+3. Click "Add New Project"
+4. Import your repository
+5. Click "Deploy"
+
+That's it! Vercel will automatically detect Next.js and configure everything.
+
+## How to Play
+
+1. Select a category from the dropdown menu (Životinje, Voće, Boje, etc.)
+2. Choose your difficulty level (Lako/Srednje/Teško)
+3. Find words by clicking and dragging across letters in the grid
+4. Words can be horizontal, vertical, or diagonal
+5. Found words turn green and are crossed out in the word list
+6. Try to find all words as fast as possible!
+
+## Built With
+
+- **Next.js 16** - React framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **React Hooks** - State management
 
 ## Learn More
 
