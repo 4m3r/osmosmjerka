@@ -417,7 +417,21 @@ export const WORD_CATEGORIES_BY_LANGUAGE: Record<Language, WordCategory[]> = {
   ],
 };
 
-export function getMixedCategory(language: Language): WordCategory {
+// Cache for mixed categories to prevent regeneration on every render
+const mixedCategoryCache: Record<Language, WordCategory | null> = {
+  bs: null,
+  en: null,
+};
+
+export function getMixedCategory(
+  language: Language,
+  forceNew: boolean = false
+): WordCategory {
+  // Return cached version unless forcing new
+  if (!forceNew && mixedCategoryCache[language]) {
+    return mixedCategoryCache[language]!;
+  }
+
   const categories = WORD_CATEGORIES_BY_LANGUAGE[language];
   const allWords: string[] = [];
 
@@ -426,16 +440,25 @@ export function getMixedCategory(language: Language): WordCategory {
     allWords.push(...category.words);
   });
 
-  // Shuffle and pick 15-20 random words
-  const shuffled = allWords.sort(() => Math.random() - 0.5);
+  // Shuffle and pick 18 random words
+  const shuffled = [...allWords].sort(() => Math.random() - 0.5);
   const selectedWords = shuffled.slice(0, 18);
 
-  return {
+  const mixedCategory = {
     name: language === "bs" ? "Miješano" : "Mixed",
     words: selectedWords,
   };
+
+  // Cache the result
+  mixedCategoryCache[language] = mixedCategory;
+
+  return mixedCategory;
 }
 
 export function getCategoriesWithMixed(language: Language): WordCategory[] {
   return [getMixedCategory(language), ...WORD_CATEGORIES_BY_LANGUAGE[language]];
+}
+
+export function regenerateMixedCategory(language: Language): void {
+  mixedCategoryCache[language] = null;
 }

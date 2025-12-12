@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { generateWordSearch } from "@/lib/wordSearch";
-import { getCategoriesWithMixed } from "@/data/wordsMultilang";
+import {
+  getCategoriesWithMixed,
+  regenerateMixedCategory,
+} from "@/data/wordsMultilang";
 import { translations, Language } from "@/data/translations";
 import {
   saveGameState,
@@ -27,7 +30,7 @@ export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
 
   const t = translations[language];
-  const categories = getCategoriesWithMixed(language);
+  const categories = useMemo(() => getCategoriesWithMixed(language), [language]);
 
   // Load saved game on mount
   useEffect(() => {
@@ -74,7 +77,15 @@ export default function Home() {
   };
 
   const createNewPuzzle = useCallback(() => {
-    const category = categories.find((cat) => cat.name === categoryName);
+    const isMixedCategory = categoryName === (language === 'bs' ? 'Miješano' : 'Mixed');
+    
+    // Regenerate mixed category for new game
+    if (isMixedCategory) {
+      regenerateMixedCategory(language);
+    }
+    
+    const updatedCategories = getCategoriesWithMixed(language);
+    const category = updatedCategories.find((cat) => cat.name === categoryName);
     if (!category) return;
 
     const newPuzzle = generateWordSearch(category.words, difficulty);
@@ -83,7 +94,7 @@ export default function Home() {
     setScore(0);
     setTime(0);
     setIsGameComplete(false);
-  }, [categoryName, difficulty, categories]);
+  }, [categoryName, difficulty, language]);
 
   useEffect(() => {
     if (!isInitialized || !categoryName) return;
