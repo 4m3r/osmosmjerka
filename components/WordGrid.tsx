@@ -85,24 +85,75 @@ export default function WordGrid({
       const endRow = startRow + (wordLength - 1) * rowDir;
       const endCol = startCol + (wordLength - 1) * colDir;
 
-      outlines.push(
-        <div
-          key={`outline-${pos.word}-${startRow}-${startCol}`}
-          className="absolute pointer-events-none"
-          style={{
-            top: `calc(${Math.min(startRow, endRow) * 100}% / ${puzzle.size})`,
-            left: `calc(${Math.min(startCol, endCol) * 100}% / ${puzzle.size})`,
-            width: `calc(${(Math.abs(endCol - startCol) + 1) * 100}% / ${
-              puzzle.size
-            })`,
-            height: `calc(${(Math.abs(endRow - startRow) + 1) * 100}% / ${
-              puzzle.size
-            })`,
-          }}
-        >
-          <div className="w-full h-full border-3 border-green-600 rounded-lg" />
-        </div>
-      );
+      // For diagonal words, render individual cell borders
+      if (
+        pos.direction === "diagonal-down" ||
+        pos.direction === "diagonal-up"
+      ) {
+        for (let i = 0; i < wordLength; i++) {
+          const cellRow = startRow + i * rowDir;
+          const cellCol = startCol + i * colDir;
+          const isFirst = i === 0;
+          const isLast = i === wordLength - 1;
+
+          outlines.push(
+            <div
+              key={`outline-${pos.word}-${cellRow}-${cellCol}`}
+              className="absolute pointer-events-none"
+              style={{
+                top: `calc(${cellRow * 100}% / ${puzzle.size})`,
+                left: `calc(${cellCol * 100}% / ${puzzle.size})`,
+                width: `calc(100% / ${puzzle.size})`,
+                height: `calc(100% / ${puzzle.size})`,
+                padding: "2px",
+              }}
+            >
+              <div
+                className={`w-full h-full border-[3px] border-green-600 ${
+                  isFirst && pos.direction === "diagonal-down"
+                    ? "rounded-tl-lg"
+                    : isFirst && pos.direction === "diagonal-up"
+                    ? "rounded-bl-lg"
+                    : isLast && pos.direction === "diagonal-down"
+                    ? "rounded-br-lg"
+                    : isLast && pos.direction === "diagonal-up"
+                    ? "rounded-tr-lg"
+                    : ""
+                }`}
+              />
+            </div>
+          );
+        }
+      } else {
+        // Horizontal and vertical words
+        outlines.push(
+          <div
+            key={`outline-${pos.word}-${startRow}-${startCol}`}
+            className="absolute pointer-events-none"
+            style={{
+              top: `calc(${Math.min(startRow, endRow) * 100}% / ${
+                puzzle.size
+              })`,
+              left: `calc(${Math.min(startCol, endCol) * 100}% / ${
+                puzzle.size
+              })`,
+              width: `calc(${(Math.abs(endCol - startCol) + 1) * 100}% / ${
+                puzzle.size
+              })`,
+              height: `calc(${(Math.abs(endRow - startRow) + 1) * 100}% / ${
+                puzzle.size
+              })`,
+              padding: "2px",
+            }}
+          >
+            <div
+              className={`w-full h-full border-[3px] border-green-600 ${
+                pos.direction === "horizontal" ? "rounded-lg" : "rounded-lg"
+              }`}
+            />
+          </div>
+        );
+      }
     });
 
     return outlines;
