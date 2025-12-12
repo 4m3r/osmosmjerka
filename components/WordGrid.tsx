@@ -90,7 +90,7 @@ export default function WordGrid({
     const isLast = position === wordLength - 1;
 
     // Build border classes based on direction and position
-    let borders = "border-2 border-blue-500";
+    let borders = "border-2 border-yellow-800";
 
     if (foundPos.direction === "horizontal") {
       borders += " border-t border-b";
