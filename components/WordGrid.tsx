@@ -88,23 +88,31 @@ export default function WordGrid({
 
     const isFirst = position === 0;
     const isLast = position === wordLength - 1;
+    const isMiddle = !isFirst && !isLast;
 
-    // Build border classes based on direction and position
-    let borders = "border-2 border-yellow-800";
+    // Thinner borders and better spacing
+    let borders = "border-green-600";
 
     if (foundPos.direction === "horizontal") {
-      borders += " border-t border-b";
-      if (isFirst) borders += " border-l rounded-l-md";
-      if (isLast) borders += " border-r rounded-r-md";
+      // Top and bottom on all cells
+      borders += " border-t-2 border-b-2";
+      // Left border only on first cell
+      if (isFirst) borders += " border-l-2 rounded-l-lg";
+      // Right border only on last cell
+      if (isLast) borders += " border-r-2 rounded-r-lg";
     } else if (foundPos.direction === "vertical") {
-      borders += " border-l border-r";
-      if (isFirst) borders += " border-t rounded-t-md";
-      if (isLast) borders += " border-b rounded-b-md";
+      // Left and right on all cells
+      borders += " border-l-2 border-r-2";
+      // Top border only on first cell
+      if (isFirst) borders += " border-t-2 rounded-t-lg";
+      // Bottom border only on last cell
+      if (isLast) borders += " border-b-2 rounded-b-lg";
     } else {
-      // Diagonal - add border on all sides for simplicity
-      borders += " border";
-      if (isFirst) borders += " rounded-tl-md rounded-bl-md";
-      if (isLast) borders += " rounded-tr-md rounded-br-md";
+      // Diagonal - simplified approach with full border
+      borders += " border-2";
+      if (isFirst) borders += " rounded-tl-lg rounded-bl-lg";
+      if (isLast) borders += " rounded-tr-lg rounded-br-lg";
+      if (isMiddle) borders += " border-l-0 border-r-0";
     }
 
     return borders;
