@@ -2,8 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { generateWordSearch } from "@/lib/wordSearch";
-import { WORD_CATEGORIES_BY_LANGUAGE } from "@/data/wordsMultilang";
+import { getCategoriesWithMixed } from "@/data/wordsMultilang";
 import { translations, Language } from "@/data/translations";
+import {
+  saveGameState,
+  loadGameState,
+  clearGameState,
+} from "@/lib/localStorage";
 import WordGrid from "@/components/WordGrid";
 import WordList from "@/components/WordList";
 import GameControls from "@/components/GameControls";
@@ -13,21 +18,59 @@ import type { WordSearchPuzzle, Difficulty } from "@/lib/wordSearch";
 export default function Home() {
   const [language, setLanguage] = useState<Language>("bs");
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
-  const [categoryName, setCategoryName] = useState(
-    WORD_CATEGORIES_BY_LANGUAGE["bs"][0].name
-  );
+  const [categoryName, setCategoryName] = useState("");
   const [puzzle, setPuzzle] = useState<WordSearchPuzzle | null>(null);
   const [foundWords, setFoundWords] = useState<Set<string>>(new Set());
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
   const [isGameComplete, setIsGameComplete] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const t = translations[language];
-  const categories = WORD_CATEGORIES_BY_LANGUAGE[language];
+  const categories = getCategoriesWithMixed(language);
+
+  // Load saved game on mount
+  useEffect(() => {
+    const savedState = loadGameState();
+    if (savedState) {
+      setLanguage(savedState.language);
+      setDifficulty(savedState.difficulty);
+      setCategoryName(savedState.categoryName);
+      setFoundWords(new Set(savedState.foundWords));
+      setScore(savedState.score);
+      setTime(savedState.time);
+    } else {
+      setCategoryName(getCategoriesWithMixed("bs")[0].name);
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save game state whenever it changes
+  useEffect(() => {
+    if (!isInitialized || !puzzle) return;
+
+    saveGameState({
+      language,
+      difficulty,
+      categoryName,
+      foundWords: Array.from(foundWords),
+      score,
+      time,
+    });
+  }, [
+    language,
+    difficulty,
+    categoryName,
+    foundWords,
+    score,
+    time,
+    puzzle,
+    isInitialized,
+  ]);
 
   const handleLanguageChange = (newLanguage: Language) => {
     setLanguage(newLanguage);
-    setCategoryName(WORD_CATEGORIES_BY_LANGUAGE[newLanguage][0].name);
+    setCategoryName(getCategoriesWithMixed(newLanguage)[0].name);
   };
 
   const createNewPuzzle = useCallback(() => {
@@ -43,8 +86,9 @@ export default function Home() {
   }, [categoryName, difficulty, categories]);
 
   useEffect(() => {
+    if (!isInitialized || !categoryName) return;
     createNewPuzzle();
-  }, [createNewPuzzle]);
+  }, [createNewPuzzle, isInitialized, categoryName]);
 
   useEffect(() => {
     if (!puzzle || isGameComplete) return;

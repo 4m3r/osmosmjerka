@@ -201,9 +201,10 @@ export default function WordGrid({
                   font-bold rounded cursor-pointer
                   transition-colors duration-100
                   active:scale-95
+                  relative
                   ${
                     isFound
-                      ? "bg-green-400 text-white shadow-sm"
+                      ? "bg-gray-50 text-gray-400"
                       : isSelected
                       ? "bg-blue-400 text-white shadow-sm"
                       : "bg-gray-100 active:bg-gray-200 text-gray-800"
@@ -223,6 +224,11 @@ export default function WordGrid({
                 }}
               >
                 {letter}
+                {isFound && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-full h-0.5 bg-gray-600 transform rotate-0"></div>
+                  </div>
+                )}
               </div>
             );
           })
