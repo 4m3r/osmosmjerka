@@ -14,8 +14,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #171717;
   }
 }
 
@@ -23,4 +23,49 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #ffffff;
+    color: #171717;
+  }
+}
+
+/* Force visible dropdown options - aggressive override */
+select {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+  appearance: menulist !important;
+}
+
+select option {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  padding: 16px 12px !important;
+  min-height: 44px !important;
+  line-height: 1.5 !important;
+  font-size: 16px !important;
+}
+
+select option:checked,
+select option:focus,
+select option:hover,
+select option[selected] {
+  background-color: #3b82f6 !important;
+  background: linear-gradient(#3b82f6, #3b82f6) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Additional browser-specific overrides */
+select:-webkit-autofill option,
+select:-webkit-autofill option:hover,
+select:-webkit-autofill option:focus {
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }

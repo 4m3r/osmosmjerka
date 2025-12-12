@@ -77,30 +77,30 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-purple-50 py-8 px-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-purple-50 py-4 sm:py-8 px-2 sm:px-4">
       <div className="max-w-7xl mx-auto">
-        <header className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-gray-800 mb-2">
+        <header className="text-center mb-4 sm:mb-8">
+          <h1 className="text-3xl sm:text-5xl font-bold text-gray-800 mb-1 sm:mb-2">
             🔍 Osmosmjerka
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 text-sm sm:text-lg">
             Pronađi skrivene riječi u mreži!
           </p>
         </header>
 
         {isGameComplete && (
-          <div className="bg-green-100 border-2 border-green-500 rounded-lg p-6 mb-8 text-center">
-            <h2 className="text-3xl font-bold text-green-700 mb-2">
+          <div className="bg-green-100 border-2 border-green-500 rounded-lg p-4 sm:p-6 mb-4 sm:mb-8 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-green-700 mb-2">
               🎉 Čestitamo! 🎉
             </h2>
-            <p className="text-green-600">
+            <p className="text-green-600 text-sm sm:text-base">
               Pronašli ste sve riječi za {time} sekundi!
             </p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 flex justify-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
+          <div className="lg:col-span-2 flex justify-center overflow-x-auto pb-4">
             <WordGrid
               puzzle={puzzle}
               onWordFound={handleWordFound}
@@ -108,7 +108,7 @@ export default function Home() {
             />
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6 lg:order-last order-first">
             <GameControls
               difficulty={difficulty}
               onDifficultyChange={handleDifficultyChange}

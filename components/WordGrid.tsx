@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { WordSearchPuzzle } from "@/lib/wordSearch";
 
 interface WordGridProps {
@@ -22,6 +22,18 @@ export default function WordGrid({
   const [selectedCells, setSelectedCells] = useState<Cell[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
+
+  // Prevent page scrolling when interacting with grid
+  useEffect(() => {
+    const preventTouch = (e: TouchEvent) => {
+      if ((e.target as HTMLElement).closest(".word-grid")) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("touchmove", preventTouch, { passive: false });
+    return () => document.removeEventListener("touchmove", preventTouch);
+  }, []);
 
   const getCellKey = (row: number, col: number) => `${row}-${col}`;
 
@@ -58,12 +70,12 @@ export default function WordGrid({
     }
   };
 
-  const handleMouseDown = (row: number, col: number) => {
+  const handleStart = (row: number, col: number) => {
     setIsSelecting(true);
     setSelectedCells([{ row, col }]);
   };
 
-  const handleMouseEnter = (row: number, col: number) => {
+  const handleMove = (row: number, col: number) => {
     if (!isSelecting) return;
 
     if (selectedCells.length === 0) {
@@ -76,12 +88,25 @@ export default function WordGrid({
     setSelectedCells(newSelection);
   };
 
-  const handleMouseUp = () => {
+  const handleEnd = () => {
     if (selectedCells.length > 1) {
       checkForWord();
     }
     setIsSelecting(false);
     setSelectedCells([]);
+  };
+
+  const getTouchCell = (touch: React.Touch): Cell | null => {
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!element) return null;
+
+    const row = element.getAttribute("data-row");
+    const col = element.getAttribute("data-col");
+
+    if (row !== null && col !== null) {
+      return { row: parseInt(row), col: parseInt(col) };
+    }
+    return null;
   };
 
   const getCellsInLine = (start: Cell, end: Cell): Cell[] => {
@@ -134,23 +159,28 @@ export default function WordGrid({
 
   const cellSize =
     puzzle.size <= 10
-      ? "w-10 h-10 text-lg"
+      ? "w-10 h-10 sm:w-12 sm:h-12 text-base sm:text-lg"
       : puzzle.size <= 15
-      ? "w-8 h-8 text-base"
-      : "w-6 h-6 text-sm";
+      ? "w-7 h-7 sm:w-8 sm:h-8 text-sm sm:text-base"
+      : "w-5 h-5 sm:w-6 sm:h-6 text-xs sm:text-sm";
 
   return (
     <div
       ref={gridRef}
-      className="inline-block select-none"
-      onMouseUp={handleMouseUp}
+      className="word-grid inline-block select-none touch-none overscroll-none"
+      onMouseUp={handleEnd}
       onMouseLeave={() => {
+        setIsSelecting(false);
+        setSelectedCells([]);
+      }}
+      onTouchEnd={handleEnd}
+      onTouchCancel={() => {
         setIsSelecting(false);
         setSelectedCells([]);
       }}
     >
       <div
-        className="grid gap-1"
+        className="grid gap-0.5 sm:gap-1 bg-white p-2 rounded-lg shadow-md"
         style={{
           gridTemplateColumns: `repeat(${puzzle.size}, minmax(0, 1fr))`,
         }}
@@ -163,21 +193,34 @@ export default function WordGrid({
             return (
               <div
                 key={getCellKey(rowIndex, colIndex)}
+                data-row={rowIndex}
+                data-col={colIndex}
                 className={`
                   ${cellSize}
                   flex items-center justify-center
                   font-bold rounded cursor-pointer
-                  transition-colors duration-150
+                  transition-colors duration-100
+                  active:scale-95
                   ${
                     isFound
-                      ? "bg-green-400 text-white"
+                      ? "bg-green-400 text-white shadow-sm"
                       : isSelected
-                      ? "bg-blue-400 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                      ? "bg-blue-400 text-white shadow-sm"
+                      : "bg-gray-100 active:bg-gray-200 text-gray-800"
                   }
                 `}
-                onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
-                onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
+                onMouseDown={() => handleStart(rowIndex, colIndex)}
+                onMouseEnter={() => handleMove(rowIndex, colIndex)}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleStart(rowIndex, colIndex);
+                }}
+                onTouchMove={(e) => {
+                  e.preventDefault();
+                  const touch = e.touches[0];
+                  const cell = getTouchCell(touch);
+                  if (cell) handleMove(cell.row, cell.col);
+                }}
               >
                 {letter}
               </div>
