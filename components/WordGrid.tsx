@@ -55,8 +55,8 @@ export default function WordGrid({
     });
   };
 
-  const getFoundWordBorderClass = (row: number, col: number): string => {
-    const foundPos = puzzle.positions.find((pos) => {
+  const getFoundWordInfo = (row: number, col: number) => {
+    return puzzle.positions.find((pos) => {
       if (!foundWords.has(pos.word)) return false;
 
       const { rowDir, colDir } = getDirectionDeltas(pos.direction);
@@ -67,55 +67,45 @@ export default function WordGrid({
       }
       return false;
     });
+  };
 
-    if (!foundPos) return "";
+  const renderWordOutlines = () => {
+    const outlines: React.ReactElement[] = [];
+    const processedWords = new Set<string>();
 
-    const { rowDir, colDir } = getDirectionDeltas(foundPos.direction);
-    const wordLength = foundPos.word.length;
+    puzzle.positions.forEach((pos) => {
+      if (!foundWords.has(pos.word) || processedWords.has(pos.word)) return;
+      processedWords.add(pos.word);
 
-    // Find which position this cell is in the word
-    let position = -1;
-    for (let i = 0; i < wordLength; i++) {
-      const cellRow = foundPos.start.row + i * rowDir;
-      const cellCol = foundPos.start.col + i * colDir;
-      if (cellRow === row && cellCol === col) {
-        position = i;
-        break;
-      }
-    }
+      const { rowDir, colDir } = getDirectionDeltas(pos.direction);
+      const wordLength = pos.word.length;
 
-    if (position === -1) return "";
+      const startRow = pos.start.row;
+      const startCol = pos.start.col;
+      const endRow = startRow + (wordLength - 1) * rowDir;
+      const endCol = startCol + (wordLength - 1) * colDir;
 
-    const isFirst = position === 0;
-    const isLast = position === wordLength - 1;
-    const isMiddle = !isFirst && !isLast;
+      outlines.push(
+        <div
+          key={`outline-${pos.word}-${startRow}-${startCol}`}
+          className="absolute pointer-events-none"
+          style={{
+            top: `calc(${Math.min(startRow, endRow) * 100}% / ${puzzle.size})`,
+            left: `calc(${Math.min(startCol, endCol) * 100}% / ${puzzle.size})`,
+            width: `calc(${(Math.abs(endCol - startCol) + 1) * 100}% / ${
+              puzzle.size
+            })`,
+            height: `calc(${(Math.abs(endRow - startRow) + 1) * 100}% / ${
+              puzzle.size
+            })`,
+          }}
+        >
+          <div className="w-full h-full border-3 border-green-600 rounded-lg" />
+        </div>
+      );
+    });
 
-    // Thinner borders and better spacing
-    let borders = "border-green-600";
-
-    if (foundPos.direction === "horizontal") {
-      // Top and bottom on all cells
-      borders += " border-t-2 border-b-2";
-      // Left border only on first cell
-      if (isFirst) borders += " border-l-2 rounded-l-lg";
-      // Right border only on last cell
-      if (isLast) borders += " border-r-2 rounded-r-lg";
-    } else if (foundPos.direction === "vertical") {
-      // Left and right on all cells
-      borders += " border-l-2 border-r-2";
-      // Top border only on first cell
-      if (isFirst) borders += " border-t-2 rounded-t-lg";
-      // Bottom border only on last cell
-      if (isLast) borders += " border-b-2 rounded-b-lg";
-    } else {
-      // Diagonal - simplified approach with full border
-      borders += " border-2";
-      if (isFirst) borders += " rounded-tl-lg rounded-bl-lg";
-      if (isLast) borders += " rounded-tr-lg rounded-br-lg";
-      if (isMiddle) borders += " border-l-0 border-r-0";
-    }
-
-    return borders;
+    return outlines;
   };
 
   const getDirectionDeltas = (direction: string) => {
@@ -242,57 +232,56 @@ export default function WordGrid({
         setSelectedCells([]);
       }}
     >
-      <div
-        className="grid gap-0.5 sm:gap-1 bg-white p-2 rounded-lg shadow-md"
-        style={{
-          gridTemplateColumns: `repeat(${puzzle.size}, minmax(0, 1fr))`,
-        }}
-      >
-        {puzzle.grid.map((row, rowIndex) =>
-          row.map((letter, colIndex) => {
-            const isSelected = isCellSelected(rowIndex, colIndex);
-            const isFound = isCellInFoundWord(rowIndex, colIndex);
-            const borderClass = isFound
-              ? getFoundWordBorderClass(rowIndex, colIndex)
-              : "";
+      <div className="relative">
+        <div
+          className="grid gap-0.5 sm:gap-1 bg-white p-2 rounded-lg shadow-md"
+          style={{
+            gridTemplateColumns: `repeat(${puzzle.size}, minmax(0, 1fr))`,
+          }}
+        >
+          {puzzle.grid.map((row, rowIndex) =>
+            row.map((letter, colIndex) => {
+              const isSelected = isCellSelected(rowIndex, colIndex);
+              const isFound = isCellInFoundWord(rowIndex, colIndex);
 
-            return (
-              <div
-                key={getCellKey(rowIndex, colIndex)}
-                data-row={rowIndex}
-                data-col={colIndex}
-                className={`
-                  ${cellSize}
-                  flex items-center justify-center
-                  font-bold cursor-pointer
-                  transition-colors duration-100
-                  active:scale-95
-                  relative
-                  ${borderClass}
-                  ${
-                    isSelected
-                      ? "bg-blue-400 text-white shadow-sm"
-                      : "bg-gray-100 active:bg-gray-200 text-gray-800"
-                  }
-                `}
-                onMouseDown={() => handleStart(rowIndex, colIndex)}
-                onMouseEnter={() => handleMove(rowIndex, colIndex)}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  handleStart(rowIndex, colIndex);
-                }}
-                onTouchMove={(e) => {
-                  e.preventDefault();
-                  const touch = e.touches[0];
-                  const cell = getTouchCell(touch);
-                  if (cell) handleMove(cell.row, cell.col);
-                }}
-              >
-                {letter}
-              </div>
-            );
-          })
-        )}
+              return (
+                <div
+                  key={getCellKey(rowIndex, colIndex)}
+                  data-row={rowIndex}
+                  data-col={colIndex}
+                  className={`
+                    ${cellSize}
+                    flex items-center justify-center
+                    font-bold cursor-pointer
+                    transition-colors duration-100
+                    active:scale-95
+                    relative
+                    ${
+                      isSelected
+                        ? "bg-blue-400 text-white shadow-sm"
+                        : "bg-gray-100 active:bg-gray-200 text-gray-800"
+                    }
+                  `}
+                  onMouseDown={() => handleStart(rowIndex, colIndex)}
+                  onMouseEnter={() => handleMove(rowIndex, colIndex)}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    handleStart(rowIndex, colIndex);
+                  }}
+                  onTouchMove={(e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const cell = getTouchCell(touch);
+                    if (cell) handleMove(cell.row, cell.col);
+                  }}
+                >
+                  {letter}
+                </div>
+              );
+            })
+          )}
+        </div>
+        {renderWordOutlines()}
       </div>
     </div>
   );
