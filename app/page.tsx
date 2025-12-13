@@ -16,6 +16,8 @@ import WordGrid from "@/components/WordGrid";
 import WordList from "@/components/WordList";
 import GameControls from "@/components/GameControls";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import CompletionModal from "@/components/CompletionModal";
+import Leaderboard from "@/components/Leaderboard";
 import type { WordSearchPuzzle, Difficulty } from "@/lib/wordSearch";
 
 export default function Home() {
@@ -28,6 +30,8 @@ export default function Home() {
   const [time, setTime] = useState(0);
   const [isGameComplete, setIsGameComplete] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const t = translations[language];
   const categories = useMemo(
@@ -123,11 +127,13 @@ export default function Home() {
     if (
       puzzle &&
       foundWords.size === puzzle.words.length &&
-      puzzle.words.length > 0
+      puzzle.words.length > 0 &&
+      !isGameComplete
     ) {
       setIsGameComplete(true);
+      setShowCompletionModal(true);
     }
-  }, [foundWords, puzzle]);
+  }, [foundWords, puzzle, isGameComplete]);
 
   const handleWordFound = (word: string) => {
     if (!foundWords.has(word)) {
@@ -199,6 +205,14 @@ export default function Home() {
               time={time}
               translations={t}
             />
+
+            <button
+              onClick={() => setShowLeaderboard(true)}
+              className="w-full bg-yellow-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
+            >
+              🏆 {language === "bs" ? "Rang lista" : "Leaderboard"}
+            </button>
+
             <WordList
               words={puzzle.words}
               foundWords={foundWords}
@@ -212,6 +226,24 @@ export default function Home() {
             Developed by Amer following instructions from Lajla & Berina ❤️
           </p>
         </footer>
+
+        <CompletionModal
+          isOpen={showCompletionModal}
+          onClose={() => setShowCompletionModal(false)}
+          time={time}
+          score={score}
+          difficulty={difficulty}
+          category={categoryName}
+          language={language}
+        />
+
+        <Leaderboard
+          isOpen={showLeaderboard}
+          onClose={() => setShowLeaderboard(false)}
+          difficulty={difficulty}
+          category={categoryName}
+          language={language}
+        />
       </div>
     </div>
   );

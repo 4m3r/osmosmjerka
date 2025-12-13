@@ -11,6 +11,7 @@ export interface Translations {
   newGame: string;
   time: string;
   points: string;
+  score: string;
   wordsToFind: string;
   found: string;
   congratulations: string;
@@ -30,6 +31,7 @@ export const translations: Record<Language, Translations> = {
     newGame: "🎮 Nova Igra",
     time: "⏱️ Vrijeme:",
     points: "⭐ Bodovi:",
+    score: "Rezultat",
     wordsToFind: "Riječi za Pronaći",
     found: "Pronađeno:",
     congratulations: "🎉 Čestitamo! 🎉",
@@ -47,6 +49,7 @@ export const translations: Record<Language, Translations> = {
     newGame: "🎮 New Game",
     time: "⏱️ Time:",
     points: "⭐ Points:",
+    score: "Score", 
     wordsToFind: "Words to Find",
     found: "Found:",
     congratulations: "🎉 Congratulations! 🎉",
