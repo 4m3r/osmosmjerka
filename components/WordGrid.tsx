@@ -283,7 +283,7 @@ export default function WordGrid({
     >
       <div className="relative">
         <div
-          className="grid gap-0.5 sm:gap-1 bg-white p-2 rounded-lg shadow-md"
+          className="grid gap-0.5 sm:gap-1 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md"
           style={{
             gridTemplateColumns: `repeat(${puzzle.size}, minmax(0, 1fr))`,
           }}
@@ -308,7 +308,7 @@ export default function WordGrid({
                     ${
                       isSelected
                         ? "bg-blue-400 text-white shadow-sm"
-                        : "bg-gray-100 active:bg-gray-200 text-gray-800"
+                        : "bg-gray-100 dark:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 text-gray-800 dark:text-gray-100"
                     }
                   `}
                   onMouseDown={() => handleStart(rowIndex, colIndex)}

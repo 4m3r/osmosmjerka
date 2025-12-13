@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import confetti from "canvas-confetti";
 import { generateWordSearch } from "@/lib/wordSearch";
 import {
   getCategoriesWithMixed,
@@ -12,10 +13,12 @@ import {
   loadGameState,
   clearGameState,
 } from "@/lib/localStorage";
+import { playSound } from "@/lib/sounds";
 import WordGrid from "@/components/WordGrid";
 import WordList from "@/components/WordList";
 import GameControls from "@/components/GameControls";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ThemeToggle from "@/components/ThemeToggle";
 import CompletionModal from "@/components/CompletionModal";
 import Leaderboard from "@/components/Leaderboard";
 import type { WordSearchPuzzle, Difficulty } from "@/lib/wordSearch";
@@ -132,6 +135,36 @@ export default function Home() {
     ) {
       setIsGameComplete(true);
       setShowCompletionModal(true);
+
+      // Play victory sound
+      playSound("puzzleComplete");
+
+      // Trigger confetti
+      const duration = 3000;
+      const end = Date.now() + duration;
+
+      const colors = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
+
+      (function frame() {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors,
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors,
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
     }
   }, [foundWords, puzzle, isGameComplete]);
 
@@ -139,6 +172,9 @@ export default function Home() {
     if (!foundWords.has(word)) {
       setFoundWords(new Set([...foundWords, word]));
       setScore(score + word.length * 10);
+
+      // Play word found sound
+      playSound("wordFound");
     }
   };
 
@@ -159,13 +195,18 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-purple-50 py-4 sm:py-8 px-2 sm:px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 py-4 sm:py-8 px-2 sm:px-4 transition-colors">
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-4 sm:mb-6">
-          <h1 className="text-3xl sm:text-5xl font-bold text-gray-800 mb-1 sm:mb-2">
-            {t.title}
-          </h1>
-          <p className="text-gray-600 text-sm sm:text-lg mb-3">{t.subtitle}</p>
+          <div className="flex justify-center items-center gap-4 mb-4">
+            <h1 className="text-3xl sm:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">
+              {t.title}
+            </h1>
+            <ThemeToggle />
+          </div>
+          <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-lg mb-3">
+            {t.subtitle}
+          </p>
           <LanguageSwitcher
             currentLanguage={language}
             onLanguageChange={handleLanguageChange}
