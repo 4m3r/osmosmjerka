@@ -67,7 +67,7 @@ export const WORD_CATEGORIES: WordCategory[] = [
       "brat",
       "sestra",
       "baka",
-      "deda",
+      "djed",
       "ujak",
       "tetka",
       "amidža",
@@ -87,7 +87,7 @@ export const WORD_CATEGORIES: WordCategory[] = [
       "tabla",
       "klupa",
       "torba",
-      "lineai",
+      "linear",
       "gumice",
       "šestari",
       "bojice",
@@ -114,7 +114,7 @@ export const WORD_CATEGORIES: WordCategory[] = [
   {
     name: "Hrana",
     words: [
-      "hleb",
+      "hljeb",
       "sir",
       "mlijeko",
       "jaje",

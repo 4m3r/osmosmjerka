@@ -80,7 +80,7 @@ export const WORD_CATEGORIES_BY_LANGUAGE: Record<Language, WordCategory[]> = {
         "brat",
         "sestra",
         "baka",
-        "deda",
+        "djed",
         "ujak",
         "tetka",
         "amidža",
@@ -100,7 +100,7 @@ export const WORD_CATEGORIES_BY_LANGUAGE: Record<Language, WordCategory[]> = {
         "tabla",
         "klupa",
         "torba",
-        "lineai",
+        "linear",
         "gumice",
         "šestari",
         "bojice",
@@ -132,7 +132,7 @@ export const WORD_CATEGORIES_BY_LANGUAGE: Record<Language, WordCategory[]> = {
     {
       name: "Hrana",
       words: [
-        "hleb",
+        "hljeb",
         "sir",
         "mlijeko",
         "jaje",

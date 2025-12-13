@@ -39,25 +39,10 @@ export default function GameControls({
         <select
           value={category}
           onChange={(e) => onCategoryChange(e.target.value)}
-          className="w-full px-3 py-2.5 text-base border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          style={{
-            color: "#000000",
-            backgroundColor: "#FFFFFF",
-            WebkitAppearance: "menulist",
-            MozAppearance: "menulist",
-            appearance: "menulist",
-          }}
+          className="w-full px-3 py-2.5 text-base border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white [&>option]:!text-gray-900 [&>option]:!bg-white [&>option:checked]:!bg-blue-600 [&>option:checked]:!text-white"
         >
           {categories.map((cat) => (
-            <option
-              key={cat}
-              value={cat}
-              style={{
-                color: "#000000",
-                backgroundColor: "#FFFFFF",
-                fontWeight: "bold",
-              }}
-            >
+            <option key={cat} value={cat}>
               {cat}
             </option>
           ))}
@@ -97,20 +82,20 @@ export default function GameControls({
         onClick={onNewGame}
         className="w-full bg-green-600 active:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all active:scale-95 shadow-md"
       >
-        🎮 Nova Igra
+        {t.newGame}
       </button>
 
       <div className="pt-3 sm:pt-4 border-t border-gray-200 space-y-2">
         <div className="flex justify-between items-center">
-          <span className="text-gray-600 text-sm sm:text-base">
-            ⏱️ Vrijeme:
-          </span>
+          <span className="text-gray-600 text-sm sm:text-base">{t.time}</span>
           <span className="font-bold text-blue-600 text-base sm:text-lg">
             {formatTime(time)}
           </span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-gray-600 text-sm sm:text-base">⭐ Bodovi:</span>
+          <span className="text-gray-600 text-sm sm:text-base">
+            ⭐ {t.score}:
+          </span>
           <span className="font-bold text-green-600 text-base sm:text-lg">
             {score}
           </span>

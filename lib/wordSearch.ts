@@ -10,6 +10,7 @@ export interface WordPosition {
   start: { row: number; col: number };
   end: { row: number; col: number };
   direction: Direction;
+  gridLength: number; // Number of cells in grid (not string length)
 }
 
 export type Direction =
@@ -28,6 +29,43 @@ const GRID_SIZES: Record<Difficulty, number> = {
 
 const BOSNIAN_LETTERS = "ABCDEFGHIJKLMNOPQRSŠTUVZŽĆČĐ";
 
+// Bosnian digraph mappings
+const DIGRAPH_TO_SINGLE: Record<string, string> = {
+  NJ: "Њ",
+  LJ: "Љ",
+  DŽ: "Џ",
+  Nj: "Њ",
+  Lj: "Љ",
+  Dž: "Џ",
+};
+
+const SINGLE_TO_DIGRAPH: Record<string, string> = {
+  Њ: "NJ",
+  Љ: "LJ",
+  Џ: "DŽ",
+};
+
+function normalizeWord(word: string): string {
+  let normalized = word;
+  // Replace digraphs with single characters (case-insensitive)
+  Object.keys(DIGRAPH_TO_SINGLE).forEach((digraph) => {
+    const regex = new RegExp(digraph, "gi");
+    normalized = normalized.replace(regex, DIGRAPH_TO_SINGLE[digraph]);
+  });
+  return normalized.toUpperCase();
+}
+
+function denormalizeWord(word: string): string {
+  let denormalized = word;
+  Object.keys(SINGLE_TO_DIGRAPH).forEach((single) => {
+    denormalized = denormalized.replace(
+      new RegExp(single, "g"),
+      SINGLE_TO_DIGRAPH[single]
+    );
+  });
+  return denormalized;
+}
+
 export function generateWordSearch(
   words: string[],
   difficulty: Difficulty = "medium"
@@ -38,24 +76,30 @@ export function generateWordSearch(
     .map(() => Array(size).fill(""));
 
   const positions: WordPosition[] = [];
-  const uppercaseWords = words.map((w) => w.toUpperCase());
+  const normalizedWords = words.map((w) => normalizeWord(w));
   const placedWords: string[] = [];
 
-  // Try to place each word
-  for (const word of uppercaseWords) {
-    const placed = placeWord(grid, word, size);
+  // Try to place each word (normalized)
+  for (let i = 0; i < normalizedWords.length; i++) {
+    const normalizedWord = normalizedWords[i];
+    const originalWord = words[i].toUpperCase();
+    const placed = placeWord(grid, normalizedWord, size, originalWord);
     if (placed) {
       positions.push(placed);
-      placedWords.push(word);
+      placedWords.push(originalWord);
     }
   }
 
-  // Fill empty cells with random letters
+  // Fill empty cells with random letters (denormalized for display)
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
       if (grid[i][j] === "") {
-        grid[i][j] =
+        const randomLetter =
           BOSNIAN_LETTERS[Math.floor(Math.random() * BOSNIAN_LETTERS.length)];
+        grid[i][j] = randomLetter;
+      } else {
+        // Denormalize any placed characters
+        grid[i][j] = denormalizeWord(grid[i][j]);
       }
     }
   }
@@ -71,7 +115,8 @@ export function generateWordSearch(
 function placeWord(
   grid: string[][],
   word: string,
-  size: number
+  size: number,
+  originalWord: string
 ): WordPosition | null {
   const directions: Direction[] = [
     "horizontal",
@@ -92,10 +137,11 @@ function placeWord(
       if (canPlaceWord(grid, word, row, col, direction, size)) {
         placeWordInGrid(grid, word, row, col, direction);
         return {
-          word,
+          word: originalWord,
           start: { row, col },
           end: getEndPosition(row, col, word.length, direction),
           direction,
+          gridLength: word.length, // Normalized word length = grid cells used
         };
       }
     }

@@ -46,7 +46,8 @@ export default function WordGrid({
       if (!foundWords.has(pos.word)) return false;
 
       const { rowDir, colDir } = getDirectionDeltas(pos.direction);
-      for (let i = 0; i < pos.word.length; i++) {
+      const gridLength = pos.gridLength || pos.word.length;
+      for (let i = 0; i < gridLength; i++) {
         const cellRow = pos.start.row + i * rowDir;
         const cellCol = pos.start.col + i * colDir;
         if (cellRow === row && cellCol === col) return true;
@@ -60,7 +61,8 @@ export default function WordGrid({
       if (!foundWords.has(pos.word)) return false;
 
       const { rowDir, colDir } = getDirectionDeltas(pos.direction);
-      for (let i = 0; i < pos.word.length; i++) {
+      const gridLength = pos.gridLength || pos.word.length;
+      for (let i = 0; i < gridLength; i++) {
         const cellRow = pos.start.row + i * rowDir;
         const cellCol = pos.start.col + i * colDir;
         if (cellRow === row && cellCol === col) return true;
@@ -78,34 +80,33 @@ export default function WordGrid({
       processedWords.add(pos.word);
 
       const { rowDir, colDir } = getDirectionDeltas(pos.direction);
-      const wordLength = pos.word.length;
+      const gridLength = pos.gridLength || pos.word.length;
 
       const startRow = pos.start.row;
       const startCol = pos.start.col;
-      const endRow = startRow + (wordLength - 1) * rowDir;
-      const endCol = startCol + (wordLength - 1) * colDir;
+      const endRow = startRow + (gridLength - 1) * rowDir;
+      const endCol = startCol + (gridLength - 1) * colDir;
 
       // For diagonal words, render individual cell borders
       if (
         pos.direction === "diagonal-down" ||
         pos.direction === "diagonal-up"
       ) {
-        for (let i = 0; i < wordLength; i++) {
+        for (let i = 0; i < gridLength; i++) {
           const cellRow = startRow + i * rowDir;
           const cellCol = startCol + i * colDir;
           const isFirst = i === 0;
-          const isLast = i === wordLength - 1;
+          const isLast = i === gridLength - 1;
 
           outlines.push(
             <div
               key={`outline-${pos.word}-${cellRow}-${cellCol}`}
               className="absolute pointer-events-none"
               style={{
-                top: `calc(${cellRow * 100}% / ${puzzle.size})`,
-                left: `calc(${cellCol * 100}% / ${puzzle.size})`,
-                width: `calc(100% / ${puzzle.size})`,
-                height: `calc(100% / ${puzzle.size})`,
-                padding: "2px",
+                top: `calc(${cellRow * 100}% / ${puzzle.size} + 0.125rem)`,
+                left: `calc(${cellCol * 100}% / ${puzzle.size} + 0.125rem)`,
+                width: `calc(100% / ${puzzle.size} - 0.25rem)`,
+                height: `calc(100% / ${puzzle.size} - 0.25rem)`,
               }}
             >
               <div
@@ -133,24 +134,19 @@ export default function WordGrid({
             style={{
               top: `calc(${Math.min(startRow, endRow) * 100}% / ${
                 puzzle.size
-              })`,
+              } + 0.125rem)`,
               left: `calc(${Math.min(startCol, endCol) * 100}% / ${
                 puzzle.size
-              })`,
+              } + 0.125rem)`,
               width: `calc(${(Math.abs(endCol - startCol) + 1) * 100}% / ${
                 puzzle.size
-              })`,
+              } - 0.25rem)`,
               height: `calc(${(Math.abs(endRow - startRow) + 1) * 100}% / ${
                 puzzle.size
-              })`,
-              padding: "2px",
+              } - 0.25rem)`,
             }}
           >
-            <div
-              className={`w-full h-full border-[3px] border-green-600 ${
-                pos.direction === "horizontal" ? "rounded-lg" : "rounded-lg"
-              }`}
-            />
+            <div className="w-full h-full border-[3px] border-green-600 rounded-lg" />
           </div>
         );
       }
@@ -247,17 +243,19 @@ export default function WordGrid({
   const checkForWord = () => {
     const selectedWord = selectedCells
       .map((cell) => puzzle.grid[cell.row][cell.col])
-      .join("");
+      .join("")
+      .toUpperCase();
 
     const reversedWord = selectedWord.split("").reverse().join("");
 
-    if (puzzle.words.includes(selectedWord) && !foundWords.has(selectedWord)) {
-      onWordFound(selectedWord);
-    } else if (
-      puzzle.words.includes(reversedWord) &&
-      !foundWords.has(reversedWord)
-    ) {
-      onWordFound(reversedWord);
+    // Check if any puzzle word matches (case-insensitive)
+    const matchedWord = puzzle.words.find(
+      (w) =>
+        w.toUpperCase() === selectedWord || w.toUpperCase() === reversedWord
+    );
+
+    if (matchedWord && !foundWords.has(matchedWord)) {
+      onWordFound(matchedWord);
     }
   };
 
